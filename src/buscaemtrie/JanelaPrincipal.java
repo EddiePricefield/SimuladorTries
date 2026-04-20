@@ -4,10 +4,10 @@
  */
 package buscaemtrie;
 
-import com.formdev.flatlaf.FlatLightLaf;
+import com.formdev.flatlaf.FlatDarkLaf;
 import java.awt.Color;
+import java.util.List;
 import javax.swing.DefaultListModel;
-import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
@@ -19,7 +19,8 @@ import javax.swing.text.StyleConstants;
 public class JanelaPrincipal extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(JanelaPrincipal.class.getName());
-
+    private Trie trie = new Trie();
+    
     /**
      * Creates new form JanelaPrincipal
      */
@@ -32,11 +33,12 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         textPaneTexto.setText( "" );
         adicionarTextoFormatado(
             "by sea sells she shells shore the by by shore she she sea ball pen chair",
-            Color.BLACK, false, false
+            Color.WHITE, false, false
         );
         
         
     }
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -64,6 +66,12 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         painelPesquisa.setBorder(javax.swing.BorderFactory.createTitledBorder("Pesquisar"));
 
         lblBuscarPor.setText("Buscar por:");
+
+        txtBuscarPor.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtBuscarPorKeyPressed(evt);
+            }
+        });
 
         btnBuscar.setText("Buscar");
         btnBuscar.addActionListener(this::btnBuscarActionPerformed);
@@ -129,34 +137,59 @@ public class JanelaPrincipal extends javax.swing.JFrame {
 
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
         
-        // como obter o conteúdo de uma caixa de texto:
-        // getText(), retorna o conteúdo do JTextField como String
-        // trim(), remove espaços nas extremidades, retornando uma nova String
-        String valor = txtBuscarPor.getText().trim();
-        System.out.println( valor );
-        
-        // cria um item (como String) de exemplo
-        String itemLista = String.format( 
-            "%s: linha %d, coluna %d", 
-            valor,
-            1, 
-            10
-        );
-        
-        // obtém o modelo da lista, limpa e adiciona um item
+        String busca = txtBuscarPor.getText().trim().toLowerCase();
         DefaultListModel<String> model = (DefaultListModel<String>) listResultado.getModel();
         model.clear();
-        model.addElement( itemLista );
+
+        if (busca.isEmpty()) {
+            String textoAtual = textPaneTexto.getText();
+            textPaneTexto.setText("");
+            adicionarTextoFormatado(textoAtual, Color.WHITE, false, false);
+            return;
+        }
+
+        String textoCompleto = textPaneTexto.getText().replace("\r", "");
+        trie.clear();
+        textPaneTexto.setText("");
+
+        String[] palavras = textoCompleto.split(" ");
+        for (int i = 0; i < palavras.length; i++) {
+            String p = palavras[i];
+            if (p.toLowerCase().equals(busca)) {
+                adicionarTextoFormatado(p, Color.RED, true, true);
+            } else {
+                adicionarTextoFormatado(p, Color.WHITE, false, false);
+            }
+
+            if (i < palavras.length - 1) {
+                adicionarTextoFormatado(" ", Color.WHITE, false, false);
+            }
+        }
         
-        // adiciona texto formatado ao JTextPane
-        adicionarTextoFormatado( valor, Color.BLUE, true, true );
-        
+        List<Posicao> resultados = trie.buscar(busca);
+
+        if (resultados.isEmpty()) {
+            model.addElement("Não encontrado.");
+        } else {
+            for (Posicao pos : resultados) {
+                model.addElement(pos.toString());
+            }
+        }
         
     }//GEN-LAST:event_btnBuscarActionPerformed
+
+    private void txtBuscarPorKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtBuscarPorKeyPressed
+        
+        if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
+            btnBuscarActionPerformed(null);
+        }
+        
+    }//GEN-LAST:event_txtBuscarPorKeyPressed
 
     private void adicionarTextoFormatado( String texto, Color cor, boolean italico, boolean negrito ) {
         
         try {
+            int posicaoInicial = textPaneTexto.getDocument().getLength();
             
             SimpleAttributeSet as = new SimpleAttributeSet();
             StyleConstants.setForeground( as, cor );
@@ -164,6 +197,20 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             StyleConstants.setItalic( as, italico );
             
             textPaneTexto.getDocument().insertString( textPaneTexto.getDocument().getLength(), texto, as );
+            
+            String[] palavras = texto.split(" ");
+            int deslocamento = 0;
+            
+            for (String p : palavras) {
+                if (!p.isEmpty()) {
+                    // A coluna real é a posição inicial no documento + o deslocamento da palavra
+                    int colunaReal = posicaoInicial + deslocamento;
+                    trie.inserir(p, 1, colunaReal);
+
+                    // Atualiza o deslocamento para a próxima palavra (+1 do espaço)
+                    deslocamento += p.length() + 1;
+                }
+            }
             
         } catch ( BadLocationException exc ) {
             exc.printStackTrace();
@@ -175,7 +222,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        FlatLightLaf.setup();
+        FlatDarkLaf.setup();
         java.awt.EventQueue.invokeLater(() -> new JanelaPrincipal().setVisible(true));
     }
 
