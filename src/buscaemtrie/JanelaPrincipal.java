@@ -61,6 +61,11 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Busca em Trie");
 
+        textPaneTexto.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                textPaneTextoKeyReleased(evt);
+            }
+        });
         scrollPaneTexto.setViewportView(textPaneTexto);
 
         painelPesquisa.setBorder(javax.swing.BorderFactory.createTitledBorder("Pesquisar"));
@@ -185,6 +190,15 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         }
         
     }//GEN-LAST:event_txtBuscarPorKeyPressed
+
+    private void textPaneTextoKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_textPaneTextoKeyReleased
+        if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_BACK_SPACE) {
+            if (textPaneTexto.getText().equals("")) {
+                adicionarTextoFormatado(" ", Color.WHITE, false, false);
+                textPaneTexto.setText("");
+            }
+        }
+    }//GEN-LAST:event_textPaneTextoKeyReleased
 
     private void adicionarTextoFormatado( String texto, Color cor, boolean italico, boolean negrito ) {
         
