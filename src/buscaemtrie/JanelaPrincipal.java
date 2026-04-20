@@ -175,7 +175,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         textPaneTexto.setText("");
         
         //Eu tentei tanto regex diferente pra fazer com que uma palavra colada em uma pontuação funcionasse... no final, preferi adicionar cada simbolo individualmente porque MEUDEUS cara que negócio chatoooo
-        String[] palavras = textoCompleto.split(" +|(?<=[.,:;=\\-*()\\[\\]{}])|(?=[.,:;=\\-*()\\[\\]{}])"); //Botei todos os simbolos porque sim não me julga
+        String[] palavras = textoCompleto.split(" +|(?<=[.,:;=\\-*()\\[\\]{}\\?])|(?=[.,:;=\\-*()\\[\\]{}\\?])"); //Botei todos os simbolos porque sim não me julga
         for (int i = 0; i < palavras.length; i++) {
             String p = palavras[i];
             if (p.toLowerCase().equals(busca)) {
@@ -191,7 +191,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
                 else if (p.matches("[-]") && palavras[i - 1].matches("[\\p{L}]+")) {// Para palavras com hífen, porque fui pensar nisso depois e real tava botando espaço depois de todos os - :D
                 }
                 
-                else if (!(palavras[i + 1].matches("[.,:;=\\-*()\\[\\]{} ]")) && !p.matches("[\\[\\{\\(]")){// Verifica se o próximo e o atual nas listas de simbolos... Talvez faltou algum
+                else if (!(palavras[i + 1].matches("[.,:;=\\-*()\\[\\]{}\\?]")) && !p.matches("[\\[\\{\\(]")){// Verifica se o próximo e o atual nas listas de simbolos... Talvez faltou algum
                     adicionarTextoFormatado(" ", Color.WHITE, false, false);
                 }
             }
