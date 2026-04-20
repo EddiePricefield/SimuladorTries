@@ -58,6 +58,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         scrollPaneResultado = new javax.swing.JScrollPane();
         listResultado = new javax.swing.JList<>();
         btnLimpar = new javax.swing.JButton();
+        btnAbrir = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Busca em Trie");
@@ -90,6 +91,10 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         btnLimpar.setToolTipText("Limpar caixa de texto");
         btnLimpar.addActionListener(this::btnLimparActionPerformed);
 
+        btnAbrir.setText("Abrir");
+        btnAbrir.setToolTipText("Abrir documento .txt");
+        btnAbrir.addActionListener(this::btnAbrirActionPerformed);
+
         javax.swing.GroupLayout painelPesquisaLayout = new javax.swing.GroupLayout(painelPesquisa);
         painelPesquisa.setLayout(painelPesquisaLayout);
         painelPesquisaLayout.setHorizontalGroup(
@@ -103,8 +108,10 @@ public class JanelaPrincipal extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txtBuscarPor))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelPesquisaLayout.createSequentialGroup()
+                        .addComponent(btnAbrir, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btnLimpar)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 87, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnBuscar)))
                 .addContainerGap())
         );
@@ -118,7 +125,8 @@ public class JanelaPrincipal extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(painelPesquisaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnBuscar)
-                    .addComponent(btnLimpar))
+                    .addComponent(btnLimpar)
+                    .addComponent(btnAbrir))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(scrollPaneResultado, javax.swing.GroupLayout.DEFAULT_SIZE, 219, Short.MAX_VALUE)
                 .addContainerGap())
@@ -130,7 +138,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(scrollPaneTexto, javax.swing.GroupLayout.DEFAULT_SIZE, 325, Short.MAX_VALUE)
+                .addComponent(scrollPaneTexto, javax.swing.GroupLayout.DEFAULT_SIZE, 336, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(painelPesquisa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -170,7 +178,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         for (int i = 0; i < palavras.length; i++) {
             String p = palavras[i];
             if (p.toLowerCase().equals(busca)) {
-                adicionarTextoFormatado(p, Color.RED, true, true);
+                adicionarTextoFormatado(p, new Color(75, 120, 175), true, true);
             } else {
                 adicionarTextoFormatado(p, Color.WHITE, false, false);
             }
@@ -183,7 +191,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         List<Posicao> resultados = trie.buscar(busca);
 
         if (resultados.isEmpty()) {
-            model.addElement("Não encontrado.");
+            model.addElement("Palavra não encontrada");
         } else {
             for (Posicao pos : resultados) {
                 model.addElement(pos.toString());
@@ -215,6 +223,33 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         adicionarTextoFormatado(" ", Color.WHITE, false, false);
         textPaneTexto.setText("");
     }//GEN-LAST:event_btnLimparActionPerformed
+
+    private void btnAbrirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAbrirActionPerformed
+        javax.swing.JFileChooser buscador = new javax.swing.JFileChooser();
+
+        javax.swing.filechooser.FileNameExtensionFilter filtro
+                = new javax.swing.filechooser.FileNameExtensionFilter("Arquivos de Texto (.txt)", "txt");
+        buscador.setFileFilter(filtro);
+        buscador.setAcceptAllFileFilterUsed(false);
+
+        int resultado = buscador.showOpenDialog(this);
+
+        if (resultado == javax.swing.JFileChooser.APPROVE_OPTION) {
+            java.io.File arquivoSelecionado = buscador.getSelectedFile();
+
+            try {
+                String conteudo = java.nio.file.Files.readString(arquivoSelecionado.toPath());
+
+                trie.clear();
+                textPaneTexto.setText("");
+
+                adicionarTextoFormatado(conteudo, Color.WHITE, false, false);
+
+            } catch (java.io.IOException ex) {
+                javax.swing.JOptionPane.showMessageDialog(this, "Não foi possível ler o arquivo: " + ex.getMessage());
+            }
+        }
+    }//GEN-LAST:event_btnAbrirActionPerformed
 
     private void adicionarTextoFormatado( String texto, Color cor, boolean italico, boolean negrito ) {
         
@@ -257,6 +292,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnAbrir;
     private javax.swing.JButton btnBuscar;
     private javax.swing.JButton btnLimpar;
     private javax.swing.JLabel lblBuscarPor;
