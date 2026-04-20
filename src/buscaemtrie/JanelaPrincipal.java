@@ -57,6 +57,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         btnBuscar = new javax.swing.JButton();
         scrollPaneResultado = new javax.swing.JScrollPane();
         listResultado = new javax.swing.JList<>();
+        btnLimpar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Busca em Trie");
@@ -79,10 +80,15 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         });
 
         btnBuscar.setText("Buscar");
+        btnBuscar.setToolTipText("Procurar pela palavra no texto");
         btnBuscar.addActionListener(this::btnBuscarActionPerformed);
 
         listResultado.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         scrollPaneResultado.setViewportView(listResultado);
+
+        btnLimpar.setText("Limpar");
+        btnLimpar.setToolTipText("Limpar caixa de texto");
+        btnLimpar.addActionListener(this::btnLimparActionPerformed);
 
         javax.swing.GroupLayout painelPesquisaLayout = new javax.swing.GroupLayout(painelPesquisa);
         painelPesquisa.setLayout(painelPesquisaLayout);
@@ -91,13 +97,14 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             .addGroup(painelPesquisaLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(painelPesquisaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(scrollPaneResultado)
+                    .addComponent(scrollPaneResultado, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addGroup(painelPesquisaLayout.createSequentialGroup()
                         .addComponent(lblBuscarPor)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txtBuscarPor))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelPesquisaLayout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(btnLimpar)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 87, Short.MAX_VALUE)
                         .addComponent(btnBuscar)))
                 .addContainerGap())
         );
@@ -109,7 +116,9 @@ public class JanelaPrincipal extends javax.swing.JFrame {
                     .addComponent(lblBuscarPor)
                     .addComponent(txtBuscarPor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnBuscar)
+                .addGroup(painelPesquisaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnBuscar)
+                    .addComponent(btnLimpar))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(scrollPaneResultado, javax.swing.GroupLayout.DEFAULT_SIZE, 219, Short.MAX_VALUE)
                 .addContainerGap())
@@ -121,7 +130,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(scrollPaneTexto, javax.swing.GroupLayout.DEFAULT_SIZE, 302, Short.MAX_VALUE)
+                .addComponent(scrollPaneTexto, javax.swing.GroupLayout.DEFAULT_SIZE, 325, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(painelPesquisa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -200,6 +209,13 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_textPaneTextoKeyReleased
 
+    private void btnLimparActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimparActionPerformed
+        DefaultListModel<String> model = (DefaultListModel<String>) listResultado.getModel();
+        model.clear();
+        adicionarTextoFormatado(" ", Color.WHITE, false, false);
+        textPaneTexto.setText("");
+    }//GEN-LAST:event_btnLimparActionPerformed
+
     private void adicionarTextoFormatado( String texto, Color cor, boolean italico, boolean negrito ) {
         
         try {
@@ -242,6 +258,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBuscar;
+    private javax.swing.JButton btnLimpar;
     private javax.swing.JLabel lblBuscarPor;
     private javax.swing.JList<String> listResultado;
     private javax.swing.JPanel painelPesquisa;
