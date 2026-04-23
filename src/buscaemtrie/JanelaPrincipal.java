@@ -22,6 +22,10 @@ public class JanelaPrincipal extends javax.swing.JFrame {
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(JanelaPrincipal.class.getName());
     private Trie trie = new Trie();
     private Color corDestaque = new Color(75, 120, 175);
+    private int itemSelecionado = 0;
+    private String textoCompleto;
+    private String busca;
+    private boolean executandoBusca = false;
     
     /**
      * Creates new form JanelaPrincipal
@@ -63,6 +67,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         btnAbrir = new javax.swing.JButton();
         btnSalvar = new javax.swing.JButton();
         btnCor = new javax.swing.JButton();
+        btnMarcarTodos = new javax.swing.JToggleButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Busca de Palavras");
@@ -89,6 +94,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         btnBuscar.addActionListener(this::btnBuscarActionPerformed);
 
         listResultado.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        listResultado.addListSelectionListener(this::listResultadoValueChanged);
         scrollPaneResultado.setViewportView(listResultado);
 
         btnLimpar.setText("Limpar");
@@ -107,6 +113,10 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         btnCor.setToolTipText("Alterar a cor da palavra destacada");
         btnCor.addActionListener(this::btnCorActionPerformed);
 
+        btnMarcarTodos.setText("❌");
+        btnMarcarTodos.setToolTipText("Marcar todas as palavras encontradas");
+        btnMarcarTodos.addActionListener(this::btnMarcarTodosActionPerformed);
+
         javax.swing.GroupLayout painelPesquisaLayout = new javax.swing.GroupLayout(painelPesquisa);
         painelPesquisa.setLayout(painelPesquisaLayout);
         painelPesquisaLayout.setHorizontalGroup(
@@ -122,13 +132,16 @@ public class JanelaPrincipal extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnBuscar))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelPesquisaLayout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(btnSalvar)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnAbrir)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnCor)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnLimpar, javax.swing.GroupLayout.DEFAULT_SIZE, 103, Short.MAX_VALUE)))
+                        .addComponent(btnMarcarTodos)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnLimpar)))
                 .addContainerGap())
         );
         painelPesquisaLayout.setVerticalGroup(
@@ -144,7 +157,8 @@ public class JanelaPrincipal extends javax.swing.JFrame {
                     .addComponent(btnLimpar)
                     .addComponent(btnAbrir)
                     .addComponent(btnSalvar)
-                    .addComponent(btnCor))
+                    .addComponent(btnCor)
+                    .addComponent(btnMarcarTodos))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(scrollPaneResultado, javax.swing.GroupLayout.DEFAULT_SIZE, 218, Short.MAX_VALUE)
                 .addContainerGap())
@@ -156,9 +170,9 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(scrollPaneTexto, javax.swing.GroupLayout.PREFERRED_SIZE, 327, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(scrollPaneTexto, javax.swing.GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(painelPesquisa, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(painelPesquisa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -177,7 +191,8 @@ public class JanelaPrincipal extends javax.swing.JFrame {
 
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
         
-        String busca = txtBuscarPor.getText().trim().toLowerCase();
+        executandoBusca = true;
+        busca = txtBuscarPor.getText().trim().toLowerCase();
         DefaultListModel<String> model = (DefaultListModel<String>) listResultado.getModel();
         model.clear();
 
@@ -188,32 +203,9 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             return;
         }
 
-        String textoCompleto = textPaneTexto.getText().replace("\r", "");
+        textoCompleto = textPaneTexto.getText().replace("\r", "");
         trie.clear();
-        textPaneTexto.setText("");
-        
-        //Eu tentei tanto regex diferente pra fazer com que uma palavra colada em uma pontuação funcionasse... no final, preferi adicionar cada simbolo individualmente porque MEUDEUS cara que negócio chatoooo
-        String[] palavras = textoCompleto.split(" +|(?<=[.,:;=\\-*()\\[\\]{}\\?])|(?=[.,:;=\\-*()\\[\\]{}\\?])"); //Botei todos os simbolos porque sim não me julga
-        for (int i = 0; i < palavras.length; i++) {
-            String p = palavras[i];
-            if (p.toLowerCase().equals(busca)) {
-                adicionarTextoFormatado(p, corDestaque, true, true);
-            } else {
-                adicionarTextoFormatado(p, Color.WHITE, false, false);
-            }
-
-            if (i < palavras.length - 1) {
-                if (p.matches("[.]") && palavras[i + 1].matches("[0-9]+")) { //Para valores do tipo 10.0
-                }
-                
-                else if (p.matches("[-]") && palavras[i - 1].matches("[\\p{L}]+")) {// Para palavras com hífen, porque fui pensar nisso depois e real tava botando espaço depois de todos os - :D
-                }
-                
-                else if (!(palavras[i + 1].matches("[.,:;=\\-*()\\[\\]{}\\?]")) && !p.matches("[\\[\\{\\(]")){// Verifica se o próximo e o atual nas listas de simbolos... Talvez faltou algum
-                    adicionarTextoFormatado(" ", Color.WHITE, false, false);
-                }
-            }
-        }
+        reescreverTexto();
         
         List<Posicao> resultados = trie.buscar(busca);
 
@@ -224,6 +216,8 @@ public class JanelaPrincipal extends javax.swing.JFrame {
                 model.addElement(pos.toString());
             }
         }
+        
+        executandoBusca = false;
         
     }//GEN-LAST:event_btnBuscarActionPerformed
 
@@ -315,6 +309,23 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnCorActionPerformed
 
+    private void listResultadoValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_listResultadoValueChanged
+        if (!executandoBusca) {
+            reescreverTexto();
+        }
+    }//GEN-LAST:event_listResultadoValueChanged
+
+    private void btnMarcarTodosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMarcarTodosActionPerformed
+        
+        if (btnMarcarTodos.isSelected()){
+            btnMarcarTodos.setText("✔");
+        }else{
+            btnMarcarTodos.setText("❌");
+        }
+        
+        btnBuscarActionPerformed(null);
+    }//GEN-LAST:event_btnMarcarTodosActionPerformed
+
     private void adicionarTextoFormatado( String texto, Color cor, boolean italico, boolean negrito ) {
         
         try {
@@ -347,6 +358,41 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         
     }
     
+    private void reescreverTexto(){
+        textPaneTexto.setText("");
+        
+        //Eu tentei tanto regex diferente pra fazer com que uma palavra colada em uma pontuação funcionasse... no final, preferi adicionar cada simbolo individualmente porque MEUDEUS cara que negócio chatoooo
+        String[] palavras = textoCompleto.split(" +|(?<=[.,:;=\\-*()\\[\\]{}\\?])|(?=[.,:;=\\-*()\\[\\]{}\\?])"); //Botei todos os simbolos porque sim não me julga
+        int temp = 0;
+        for (int i = 0; i < palavras.length; i++) {
+            String p = palavras[i];
+            if (p.toLowerCase().equals(busca)) {
+                if (btnMarcarTodos.isSelected() || temp == listResultado.getSelectedIndex()){
+                    adicionarTextoFormatado(p, corDestaque, true, true);
+                    temp++;
+                }else{
+                    adicionarTextoFormatado(p, Color.WHITE, false, false);
+                    temp++;
+                }
+                
+            } else {
+                adicionarTextoFormatado(p, Color.WHITE, false, false);
+            }
+
+            if (i < palavras.length - 1) {
+                if (p.matches("[.]") && palavras[i + 1].matches("[0-9]+")) { //Para valores do tipo 10.0
+                }
+                
+                else if (p.matches("[-]") && palavras[i - 1].matches("[\\p{L}]+")) {// Para palavras com hífen, porque fui pensar nisso depois e real tava botando espaço depois de todos os - :D
+                }
+                
+                else if (!(palavras[i + 1].matches("[.,:;=\\-*()\\[\\]{}\\?]")) && !p.matches("[\\[\\{\\(]")){// Verifica se o próximo e o atual nas listas de simbolos... Talvez faltou algum
+                    adicionarTextoFormatado(" ", Color.WHITE, false, false);
+                }
+            }
+        }
+    }
+    
     /**
      * @param args the command line arguments
      */
@@ -360,6 +406,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
     private javax.swing.JButton btnBuscar;
     private javax.swing.JButton btnCor;
     private javax.swing.JButton btnLimpar;
+    private javax.swing.JToggleButton btnMarcarTodos;
     private javax.swing.JButton btnSalvar;
     private javax.swing.JLabel lblBuscarPor;
     private javax.swing.JList<String> listResultado;
