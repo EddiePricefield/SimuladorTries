@@ -104,7 +104,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         btnSalvar.addActionListener(this::btnSalvarActionPerformed);
 
         btnCor.setText("🎨");
-        btnCor.setToolTipText("Alterar a cor de marcação da palavra encontrada");
+        btnCor.setToolTipText("Alterar a cor da palavra destacada");
         btnCor.addActionListener(this::btnCorActionPerformed);
 
         javax.swing.GroupLayout painelPesquisaLayout = new javax.swing.GroupLayout(painelPesquisa);

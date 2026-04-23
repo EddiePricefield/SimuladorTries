@@ -191,7 +191,7 @@
         <Component class="javax.swing.JButton" name="btnCor">
           <Properties>
             <Property name="text" type="java.lang.String" value="\ud83c\udfa8" containsInvalidXMLChars="true"/>
-            <Property name="toolTipText" type="java.lang.String" value="Alterar a cor de marca&#xe7;&#xe3;o da palavra encontrada"/>
+            <Property name="toolTipText" type="java.lang.String" value="Alterar a cor da palavra destacada"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnCorActionPerformed"/>
