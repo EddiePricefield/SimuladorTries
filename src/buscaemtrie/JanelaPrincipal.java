@@ -8,6 +8,7 @@ import com.formdev.flatlaf.FlatDarkLaf;
 import java.awt.Color;
 import java.util.List;
 import javax.swing.DefaultListModel;
+import javax.swing.JColorChooser;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
@@ -20,6 +21,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(JanelaPrincipal.class.getName());
     private Trie trie = new Trie();
+    private Color corDestaque = new Color(75, 120, 175);
     
     /**
      * Creates new form JanelaPrincipal
@@ -32,7 +34,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         
         textPaneTexto.setText( "" );
         adicionarTextoFormatado(
-            "by sea sells she shells shore the by by shore she she sea ball pen chair",
+            "by sea sells she shells shore the by by shore she she sea ball pen chair.",
             Color.WHITE, false, false
         );
         
@@ -59,9 +61,11 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         listResultado = new javax.swing.JList<>();
         btnLimpar = new javax.swing.JButton();
         btnAbrir = new javax.swing.JButton();
+        btnSalvar = new javax.swing.JButton();
+        btnCor = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Busca em Trie");
+        setTitle("Busca de Palavras");
 
         textPaneTexto.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
@@ -80,8 +84,8 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             }
         });
 
-        btnBuscar.setText("Buscar");
-        btnBuscar.setToolTipText("Procurar pela palavra no texto");
+        btnBuscar.setText("🔎");
+        btnBuscar.setToolTipText("Procurar pela palavra no texto usando trie");
         btnBuscar.addActionListener(this::btnBuscarActionPerformed);
 
         listResultado.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
@@ -91,9 +95,17 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         btnLimpar.setToolTipText("Limpar caixa de texto");
         btnLimpar.addActionListener(this::btnLimparActionPerformed);
 
-        btnAbrir.setText("Abrir");
-        btnAbrir.setToolTipText("Abrir documento .txt");
+        btnAbrir.setText("📂");
+        btnAbrir.setToolTipText("Abrir arquivo .txt");
         btnAbrir.addActionListener(this::btnAbrirActionPerformed);
+
+        btnSalvar.setText("💾");
+        btnSalvar.setToolTipText("Salvar como arquivo .txt");
+        btnSalvar.addActionListener(this::btnSalvarActionPerformed);
+
+        btnCor.setText("🎨");
+        btnCor.setToolTipText("Alterar a cor de marcação da palavra encontrada");
+        btnCor.addActionListener(this::btnCorActionPerformed);
 
         javax.swing.GroupLayout painelPesquisaLayout = new javax.swing.GroupLayout(painelPesquisa);
         painelPesquisa.setLayout(painelPesquisaLayout);
@@ -106,13 +118,17 @@ public class JanelaPrincipal extends javax.swing.JFrame {
                     .addGroup(painelPesquisaLayout.createSequentialGroup()
                         .addComponent(lblBuscarPor)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtBuscarPor))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelPesquisaLayout.createSequentialGroup()
-                        .addComponent(btnAbrir, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnLimpar)
+                        .addComponent(txtBuscarPor)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnBuscar)))
+                        .addComponent(btnBuscar))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelPesquisaLayout.createSequentialGroup()
+                        .addComponent(btnSalvar)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnAbrir)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnCor)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnLimpar, javax.swing.GroupLayout.DEFAULT_SIZE, 103, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         painelPesquisaLayout.setVerticalGroup(
@@ -121,14 +137,16 @@ public class JanelaPrincipal extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(painelPesquisaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblBuscarPor)
-                    .addComponent(txtBuscarPor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtBuscarPor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnBuscar))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(painelPesquisaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnBuscar)
                     .addComponent(btnLimpar)
-                    .addComponent(btnAbrir))
+                    .addComponent(btnAbrir)
+                    .addComponent(btnSalvar)
+                    .addComponent(btnCor))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(scrollPaneResultado, javax.swing.GroupLayout.DEFAULT_SIZE, 219, Short.MAX_VALUE)
+                .addComponent(scrollPaneResultado, javax.swing.GroupLayout.DEFAULT_SIZE, 218, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -138,9 +156,9 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(scrollPaneTexto, javax.swing.GroupLayout.DEFAULT_SIZE, 336, Short.MAX_VALUE)
+                .addComponent(scrollPaneTexto, javax.swing.GroupLayout.PREFERRED_SIZE, 327, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(painelPesquisa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(painelPesquisa, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -179,7 +197,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         for (int i = 0; i < palavras.length; i++) {
             String p = palavras[i];
             if (p.toLowerCase().equals(busca)) {
-                adicionarTextoFormatado(p, new Color(75, 120, 175), true, true);
+                adicionarTextoFormatado(p, corDestaque, true, true);
             } else {
                 adicionarTextoFormatado(p, Color.WHITE, false, false);
             }
@@ -260,6 +278,43 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnAbrirActionPerformed
 
+    private void btnSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarActionPerformed
+        javax.swing.JFileChooser salvador = new javax.swing.JFileChooser();
+
+        javax.swing.filechooser.FileNameExtensionFilter filtro
+                = new javax.swing.filechooser.FileNameExtensionFilter("Arquivos de Texto (.txt)", "txt");
+        salvador.setFileFilter(filtro);
+        salvador.setAcceptAllFileFilterUsed(false);
+
+        int resultado = salvador.showSaveDialog(this);
+
+        if (resultado == javax.swing.JFileChooser.APPROVE_OPTION) {
+            java.io.File arquivoSelecionado = salvador.getSelectedFile();
+            
+            String caminho = arquivoSelecionado.getAbsolutePath();
+            if (!caminho.toLowerCase().endsWith(".txt")) {
+                arquivoSelecionado = new java.io.File(caminho + ".txt");
+            }
+
+            try {
+                String conteudo = textPaneTexto.getText();
+                java.nio.file.Files.writeString(arquivoSelecionado.toPath(), conteudo);
+                javax.swing.JOptionPane.showMessageDialog(this, "Arquivo salvo com sucesso");
+            } catch (java.io.IOException ex) {
+                javax.swing.JOptionPane.showMessageDialog(this, "Não foi possível salvar o arquivo: " + ex.getMessage());
+            }
+        }
+    }//GEN-LAST:event_btnSalvarActionPerformed
+
+    private void btnCorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCorActionPerformed
+        Color novaCor = JColorChooser.showDialog(null, "Selecione uma Cor", corDestaque);
+        
+        if (novaCor != null){
+            corDestaque = novaCor;
+            btnBuscarActionPerformed(null);
+        }
+    }//GEN-LAST:event_btnCorActionPerformed
+
     private void adicionarTextoFormatado( String texto, Color cor, boolean italico, boolean negrito ) {
         
         try {
@@ -303,7 +358,9 @@ public class JanelaPrincipal extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAbrir;
     private javax.swing.JButton btnBuscar;
+    private javax.swing.JButton btnCor;
     private javax.swing.JButton btnLimpar;
+    private javax.swing.JButton btnSalvar;
     private javax.swing.JLabel lblBuscarPor;
     private javax.swing.JList<String> listResultado;
     private javax.swing.JPanel painelPesquisa;
